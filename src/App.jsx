@@ -19,7 +19,7 @@ export const TRAILS_DATA = [
   { id: 8, location: "Julinek / Kuryłówka", name: "Ścieżki Puszczy Sandomierskiej", color: "bg-green-500", distance: "8.5 km", time: "2h 15m", difficulty: "Średnia", elevation: "40 m", transport: "Dojazd własny na parkingi leśne.", food: "Prowiant z plecaka", description: "Dłuższy spacer dla miłośników natury po pięknych lasach dawnej puszczy.", lat: 50.3010, lng: 22.4820, pois: ['Ostoje dzikiej zwierzyny'], familyFriendly: false }
 ];
 
-// --- INTELIGENTNY KOMPONENT MAPY LEAFLET (Wczytywanie Dynamiczne) ---
+// --- INTELIGENTNY KOMPONENT MAPY LEAFLET (Wczytywanie Dynamiczne - Omija błędy npm!) ---
 function DynamicLeafletMap({ trails, activeFilter, selectedPin, setSelectedPin, onAddTrip }) {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
