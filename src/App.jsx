@@ -1,35 +1,178 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Map, MapPin, Navigation, Camera, Sparkles, History, Heart, 
+  Map as MapIcon, MapPin, Navigation, Camera, Sparkles, History, Heart, 
   Coffee, TreePine, Mountain, Plus, Loader2, Send,
   User, Sun, CloudRain, Train, Eye, List, X,
   CalendarDays, LogOut, Bell, PhoneCall, AlertTriangle, ChevronRight, Filter,
-  Video, Image as ImageIcon, Paintbrush, PlayCircle, Upload, Film, ArrowLeft, Utensils, Activity, MessageCircle, Lock, Minus, Maximize
+  Video, Image as ImageIcon, Paintbrush, PlayCircle, Upload, Film, ArrowLeft, Utensils, Activity, MessageCircle, Lock, Minus, Maximize, Navigation2
 } from 'lucide-react';
 
-// --- BAZA DANYCH SZLAKÓW I ATRAKCJI (LEŻAJSK I OKOLICE) ---
+// --- BAZA DANYCH SZLAKÓW I ATRAKCJI Z KOORDYNATAMI GPS (Leżajsk i okolice) ---
 export const TRAILS_DATA = [
-  { id: 1, location: "Leżajsk", name: "Zespół Klasztorny o. Bernardynów", color: "bg-red-500", distance: "1.5 km", time: "1h 00m", difficulty: "Bardzo Łatwa", elevation: "10 m", transport: "Spacer z centrum / dworca PKP Leżajsk.", food: "Kawiarnia Klasztorna, restauracje w centrum", description: "Perła renesansu i baroku. Zwiedzanie bazyliki i słynnych organów.", mapX: "50%", mapY: "45%", pois: ['Bazylika Zwiastowania NMP', 'Muzeum Prowincji'], familyFriendly: true },
-  { id: 2, location: "Leżajsk", name: "Rezerwat 'Las Klasztorny'", color: "bg-green-500", distance: "4.5 km", time: "1h 15m", difficulty: "Łatwa", elevation: "30 m", transport: "Pieszo z okolic Klasztoru w kierunku zachodnim.", food: "Prowiant własny", description: "Uroczy, relaksujący spacer po leśnym rezerwacie pełnym starych drzew.", mapX: "40%", mapY: "40%", pois: ['Stare dęby', 'Ścieżka edukacyjna'], familyFriendly: true },
-  { id: 3, location: "Leżajsk", name: "Doliną Sanu na rowerze", color: "bg-blue-500", distance: "15.0 km", time: "2h 30m", difficulty: "Średnia", elevation: "50 m", transport: "Start w okolicach mostu na Sanie.", food: "Zajazdy przy głównych drogach", description: "Malownicza trasa rowerowa wzdłuż rzeki San, świetna na popołudniowy wyjazd.", mapX: "60%", mapY: "30%", pois: ['Starorzecza Sanu', 'Plaże rzeczne'], familyFriendly: false },
-  { id: 4, location: "Brzóza Królewska", name: "Spacer wokół Zalewu Floryda", color: "bg-yellow-400", distance: "3.2 km", time: "1h 00m", difficulty: "Łatwa", elevation: "10 m", transport: "Autobus PKS z Leżajska / Samochód.", food: "Punkty gastro przy zalewie, Smażalnie ryb", description: "Przyjemna ścieżka rekreacyjna wokół zalewu w sercu lasu. Idealna dla rodzin.", mapX: "30%", mapY: "60%", pois: ['Zalew Floryda', 'Plaża'], familyFriendly: true },
-  { id: 5, location: "Łańcut", name: "Zamek i Park w Łańcucie", color: "bg-purple-500", distance: "4.0 km", time: "2h 30m", difficulty: "Bardzo Łatwa", elevation: "20 m", transport: "Pociąg z Leżajska (z przesiadką) lub PKS.", food: "Restauracja Zamkowa, Kawiarnie w Rynku", description: "Półdniowa wycieczka po jednym z najpiękniejszych pałaców w Polsce i otaczającym go parku.", mapX: "20%", mapY: "80%", pois: ['Zamek', 'Wozownia', 'Oranżeria'], familyFriendly: true },
-  { id: 6, location: "Nowa Sarzyna", name: "Rezerwat Azalia Pontyjska", color: "bg-pink-500", distance: "2.5 km", time: "0h 45m", difficulty: "Łatwa", elevation: "15 m", transport: "Bus z Leżajska do Nowej Sarzyny / Woli Zarczyckiej.", food: "Karczma w Nowej Sarzynie, Pizzeria", description: "Niezwykłe miejsce, w którym na wiosnę kwitnie dzika azalia. Piękne, leśne zapachy.", mapX: "45%", mapY: "20%", pois: ['Stanowisko Azalii'], familyFriendly: true },
-  { id: 7, location: "Sieniawa", name: "Pałac Czartoryskich i Park", color: "bg-purple-500", distance: "3.5 km", time: "1h 30m", difficulty: "Łatwa", elevation: "10 m", transport: "PKS Leżajsk - Sieniawa.", food: "Restauracja Pałacowa, Kawiarnia", description: "Spokojne zwiedzanie zabytkowego parku krajobrazowego i krypt Czartoryskich.", mapX: "80%", mapY: "65%", pois: ['Pałac', 'Krypta'], familyFriendly: true },
-  { id: 8, location: "Julinek / Kuryłówka", name: "Ścieżki Puszczy Sandomierskiej", color: "bg-green-500", distance: "8.5 km", time: "2h 15m", difficulty: "Średnia", elevation: "40 m", transport: "Dojazd własny na parkingi leśne.", food: "Prowiant z plecaka", description: "Dłuższy spacer dla miłośników natury po pięknych lasach dawnej puszczy.", mapX: "70%", mapY: "25%", pois: ['Ostoje dzikiej zwierzyny'], familyFriendly: false }
+  { id: 1, location: "Leżajsk", name: "Zespół Klasztorny o. Bernardynów", color: "bg-red-500", distance: "1.5 km", time: "1h 00m", difficulty: "Bardzo Łatwa", elevation: "10 m", transport: "Spacer z centrum / dworca PKP Leżajsk.", food: "Kawiarnia Klasztorna, restauracje w centrum", description: "Perła renesansu i baroku. Zwiedzanie bazyliki i słynnych organów.", lat: 50.2644, lng: 22.4144, pois: ['Bazylika', 'Muzeum'], familyFriendly: true },
+  { id: 2, location: "Leżajsk", name: "Rezerwat 'Las Klasztorny'", color: "bg-green-500", distance: "4.5 km", time: "1h 15m", difficulty: "Łatwa", elevation: "30 m", transport: "Pieszo z okolic Klasztoru w kierunku zachodnim.", food: "Prowiant własny", description: "Uroczy, relaksujący spacer po leśnym rezerwacie pełnym starych drzew.", lat: 50.2580, lng: 22.4050, pois: ['Stare dęby'], familyFriendly: true },
+  { id: 3, location: "Leżajsk", name: "Doliną Sanu na rowerze", color: "bg-blue-500", distance: "15.0 km", time: "2h 30m", difficulty: "Średnia", elevation: "50 m", transport: "Start w okolicach mostu na Sanie.", food: "Zajazdy przy głównych drogach", description: "Malownicza trasa rowerowa wzdłuż rzeki San.", lat: 50.2850, lng: 22.4500, pois: ['Plaże rzeczne'], familyFriendly: false },
+  { id: 4, location: "Brzóza Królewska", name: "Spacer wokół Zalewu Floryda", color: "bg-yellow-400", distance: "3.2 km", time: "1h 00m", difficulty: "Łatwa", elevation: "10 m", transport: "Autobus PKS z Leżajska / Samochód.", food: "Punkty gastro przy zalewie, Smażalnie ryb", description: "Przyjemna ścieżka rekreacyjna wokół zalewu w sercu lasu. Idealna dla rodzin.", lat: 50.2150, lng: 22.3160, pois: ['Zalew Floryda', 'Plaża'], familyFriendly: true },
+  { id: 5, location: "Łańcut", name: "Zamek i Park w Łańcucie", color: "bg-purple-500", distance: "4.0 km", time: "2h 30m", difficulty: "Bardzo Łatwa", elevation: "20 m", transport: "Pociąg z Leżajska (z przesiadką) lub PKS.", food: "Restauracja Zamkowa, Kawiarnie w Rynku", description: "Półdniowa wycieczka po jednym z najpiękniejszych pałaców w Polsce i otaczającym go parku.", lat: 50.0680, lng: 22.2330, pois: ['Zamek', 'Wozownia'], familyFriendly: true },
+  { id: 6, location: "Nowa Sarzyna", name: "Rezerwat Azalia Pontyjska", color: "bg-pink-500", distance: "2.5 km", time: "0h 45m", difficulty: "Łatwa", elevation: "15 m", transport: "Bus z Leżajska do Nowej Sarzyny / Woli Zarczyckiej.", food: "Karczma w Nowej Sarzynie, Pizzeria", description: "Niezwykłe miejsce, w którym na wiosnę kwitnie dzika azalia. Piękne, leśne zapachy.", lat: 50.3110, lng: 22.3100, pois: ['Stanowisko Azalii'], familyFriendly: true },
+  { id: 7, location: "Sieniawa", name: "Pałac Czartoryskich i Park", color: "bg-purple-500", distance: "3.5 km", time: "1h 30m", difficulty: "Łatwa", elevation: "10 m", transport: "PKS Leżajsk - Sieniawa.", food: "Restauracja Pałacowa, Kawiarnia", description: "Spokojne zwiedzanie zabytkowego parku krajobrazowego i krypt Czartoryskich.", lat: 50.1780, lng: 22.6080, pois: ['Pałac', 'Krypta'], familyFriendly: true },
+  { id: 8, location: "Julinek / Kuryłówka", name: "Ścieżki Puszczy Sandomierskiej", color: "bg-green-500", distance: "8.5 km", time: "2h 15m", difficulty: "Średnia", elevation: "40 m", transport: "Dojazd własny na parkingi leśne.", food: "Prowiant z plecaka", description: "Dłuższy spacer dla miłośników natury po pięknych lasach dawnej puszczy.", lat: 50.3010, lng: 22.4820, pois: ['Ostoje dzikiej zwierzyny'], familyFriendly: false }
 ];
 
+// --- INTELIGENTNY KOMPONENT MAPY LEAFLET (Wczytywanie Dynamiczne) ---
+function DynamicLeafletMap({ trails, activeFilter, selectedPin, setSelectedPin, onAddTrip }) {
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
+  const markersLayer = useRef(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    
+    if (!document.getElementById('leaflet-css')) {
+      const link = document.createElement('link');
+      link.id = 'leaflet-css';
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      document.head.appendChild(link);
+    }
+
+    if (!document.getElementById('leaflet-js')) {
+      const script = document.createElement('script');
+      script.id = 'leaflet-js';
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      script.onload = () => { if (isMounted) setIsLoaded(true); };
+      document.body.appendChild(script);
+    } else {
+      if (window.L) setIsLoaded(true);
+      else document.getElementById('leaflet-js').addEventListener('load', () => { if (isMounted) setIsLoaded(true); });
+    }
+
+    return () => { isMounted = false; };
+  }, []);
+
+  useEffect(() => {
+    if (isLoaded && mapRef.current && !mapInstance.current) {
+      const L = window.L;
+      // Domyślne centrum mapy dla Leżajska
+      const map = L.map(mapRef.current, { zoomControl: false }).setView([50.26, 22.41], 11);
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(map);
+      
+      L.control.zoom({ position: 'topright' }).addTo(map);
+      
+      mapInstance.current = map;
+      markersLayer.current = L.featureGroup().addTo(map);
+    }
+  }, [isLoaded]);
+
+  useEffect(() => {
+    if (!mapInstance.current || !markersLayer.current) return;
+    const L = window.L;
+    markersLayer.current.clearLayers();
+
+    trails.forEach(trail => {
+      const isFood = activeFilter === '🍲 Gastronomia';
+      const colorMap = {
+        'bg-red-500': '#ef4444', 'bg-yellow-400': '#eab308', 'bg-blue-500': '#3b82f6',
+        'bg-green-500': '#22c55e', 'bg-purple-500': '#a855f7', 'bg-pink-500': '#ec4899', 'bg-gray-800': '#1f2937'
+      };
+      const hexColor = colorMap[trail.color] || '#10b981';
+      const isSelected = selectedPin?.id === trail.id;
+
+      const iconHtml = `
+        <div style="background-color: white; padding: 4px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.4); border: 3px solid ${hexColor}; font-size: 16px; text-align: center; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; transform: ${isSelected ? 'scale(1.2)' : 'scale(1)'}; transition: transform 0.2s;">
+          ${isFood ? '🍲' : '📍'}
+        </div>`;
+
+      const customIcon = L.divIcon({
+        className: 'custom-leaflet-pin',
+        html: iconHtml,
+        iconSize: [36, 36],
+        iconAnchor: [18, 36],
+        popupAnchor: [0, -36]
+      });
+
+      const marker = L.marker([trail.lat, trail.lng], { icon: customIcon });
+      
+      const popupContent = document.createElement('div');
+      popupContent.innerHTML = `
+        <div class="p-1 font-sans" style="min-width: 200px;">
+          <h3 class="font-bold text-base mb-1 text-slate-800">${trail.name}</h3>
+          <p class="text-xs text-slate-500 mb-2">${trail.location} • ${trail.difficulty}</p>
+          <p class="text-xs bg-amber-50 p-2 rounded-lg border border-amber-100 mb-3 text-slate-800"><b>🍔 Gastronomia:</b> ${trail.food}</p>
+          <button id="save-btn-${trail.id}" style="width: 100%; background-color: #059669; color: white; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: bold; border: none; cursor: pointer;">Zapisz do Pamiętnika</button>
+        </div>
+      `;
+      
+      marker.bindPopup(popupContent);
+      
+      marker.on('popupopen', () => {
+        document.getElementById(`save-btn-${trail.id}`).addEventListener('click', () => {
+          onAddTrip(trail);
+        });
+      });
+
+      marker.on('click', () => {
+        setSelectedPin(trail);
+      });
+
+      markersLayer.current.addLayer(marker);
+    });
+  }, [trails, activeFilter, selectedPin, onAddTrip]);
+
+  useEffect(() => {
+    if (mapInstance.current && selectedPin) {
+      mapInstance.current.flyTo([selectedPin.lat, selectedPin.lng], 14, { duration: 1.5 });
+    }
+  }, [selectedPin]);
+
+  const locateMe = () => {
+    if (navigator.geolocation && mapInstance.current) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        const { latitude, longitude } = pos.coords;
+        mapInstance.current.flyTo([latitude, longitude], 14);
+        window.L.marker([latitude, longitude]).addTo(mapInstance.current).bindPopup('Jesteś tutaj!').openPopup();
+      }, () => {
+        alert("Brak dostępu do lokalizacji.");
+      });
+    }
+  };
+
+  return (
+    <div className="w-full h-full relative z-0">
+      {!isLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-emerald-50 text-emerald-800 font-bold z-10 flex-col gap-3">
+          <Loader2 className="animate-spin" size={32} />
+          Ładowanie interaktywnej mapy...
+        </div>
+      )}
+      <div ref={mapRef} className="w-full h-full" style={{ zIndex: 1 }}></div>
+      <button 
+         onClick={locateMe}
+         className="absolute bottom-6 right-4 z-[400] bg-white text-blue-600 p-3 rounded-full shadow-xl border border-slate-200 hover:bg-blue-50 transition"
+         title="Znajdź mnie (GPS)"
+      >
+         <Navigation2 size={24} className="fill-current" />
+      </button>
+    </div>
+  );
+}
+
+// --- GŁÓWNA APLIKACJA ---
 export default function App() {
   const SECRET_PIN = "LEZAJSK2026"; 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
 
   const [activeTab, setActiveTab] = useState('home'); 
-  const [activeFilter, setActiveFilter] = useState('Wszystkie'); // Przeniesiony stan filtru
+  const [activeFilter, setActiveFilter] = useState('Wszystkie');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const [savedTrips, setSavedTrips] = useState([
-    { id: 101, name: "Niedziela w Łańcucie", date: "15 Sierpnia 2025", duration: "3h 10m", media: [] }
+    { id: 101, name: "Niedziela w Łańcucie", date: "15 Sierpnia 2026", duration: "3h 10m", media: [] }
   ]);
   const [activeTrip, setActiveTrip] = useState(null);
 
@@ -69,11 +212,10 @@ export default function App() {
     setActiveTab('journal');
   };
 
-  // Funkcja pomagająca zmienić widok z odpowiednim filtrem (np. po kliknięciu "Restauracje")
   const navigateToTrailsWithFilter = (filter) => {
       setActiveFilter(filter);
       setActiveTab('trails');
-  }
+  };
 
   if (!isAuthenticated) {
       return (
@@ -86,7 +228,7 @@ export default function App() {
                       <Lock size={32} className="text-white" />
                   </div>
                   <h1 className="text-3xl font-black text-white mb-2 tracking-tight">Leżajsk Przewodnik</h1>
-                  <p className="text-emerald-100/70 text-sm mb-8">Aplikacja łączy się z płatnymi interfejsami API. Wymagany jest kod autoryzacji.</p>
+                  <p className="text-emerald-100/70 text-sm mb-8">Aplikacja łączy się z interfejsami AI. Wymagany jest kod autoryzacji.</p>
                   
                   <input 
                       type="password" 
@@ -111,7 +253,7 @@ export default function App() {
   return (
     <div className="flex h-screen bg-slate-50 font-sans text-slate-900 overflow-hidden">
       
-      {/* --- DESKTOP SIDEBAR --- */}
+      {/* DESKTOP SIDEBAR */}
       <aside className="hidden md:flex flex-col w-72 bg-emerald-900 text-white shadow-2xl relative z-20">
         <div className="p-6 border-b border-emerald-800">
           <div className="flex items-center gap-3 mb-2">
@@ -125,7 +267,7 @@ export default function App() {
 
         <nav className="flex-1 px-4 py-6 space-y-2">
           <SidebarItem icon={<MapPin />} label="Pulpit Główny" isActive={activeTab === 'home'} onClick={() => setActiveTab('home')} />
-          <SidebarItem icon={<Map />} label="Trasy i Atrakcje" isActive={activeTab === 'trails'} onClick={() => setActiveTab('trails')} />
+          <SidebarItem icon={<MapIcon />} label="Mapa i Atrakcje" isActive={activeTab === 'trails'} onClick={() => setActiveTab('trails')} />
           <SidebarItem icon={<CalendarDays />} label="Planer Trasy" isActive={activeTab === 'planner'} onClick={() => setActiveTab('planner')} />
           <SidebarItem icon={<MessageCircle />} label="Asystent AI" isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} />
           <SidebarItem icon={<History />} label="Pamiętnik Wypraw" isActive={activeTab === 'journal'} onClick={() => { setActiveTab('journal'); setActiveTrip(null); }} />
@@ -145,7 +287,7 @@ export default function App() {
         </div>
       </aside>
 
-      {/* --- MOBILE TOP BAR --- */}
+      {/* MOBILE TOP BAR */}
       <div className="md:hidden fixed top-0 w-full bg-emerald-600 text-white p-4 shadow-md z-30 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <TreePine size={24} />
@@ -156,8 +298,8 @@ export default function App() {
         </button>
       </div>
 
-      {/* --- GŁÓWNA ZAWARTOŚĆ --- */}
-      <main className="flex-1 overflow-y-auto pt-16 md:pt-0 pb-20 md:pb-0 relative scroll-smooth">
+      {/* GŁÓWNA ZAWARTOŚĆ */}
+      <main className="flex-1 overflow-y-auto pt-16 md:pt-0 pb-20 md:pb-0 relative scroll-smooth z-10">
         {activeTab === 'home' && <HomeView setActiveTab={setActiveTab} navigateToTrailsWithFilter={navigateToTrailsWithFilter} />}
         {activeTab === 'trails' && <TrailsView onAddTrip={handleAddTrip} activeFilter={activeFilter} setActiveFilter={setActiveFilter} />}
         {activeTab === 'planner' && <AIPlannerView onSavePlan={handleSaveAIPlan} />}
@@ -165,10 +307,10 @@ export default function App() {
         {activeTab === 'journal' && <JournalView savedTrips={savedTrips} activeTrip={activeTrip} setActiveTrip={setActiveTrip} onAddMedia={handleAddMedia} />}
       </main>
 
-      {/* --- MOBILE BOTTOM NAV --- */}
-      <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.05)] z-30">
+      {/* MOBILE BOTTOM NAV */}
+      <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe shadow-[0_-10px_20px_rgba(0,0,0,0.05)] z-40">
         <NavItem icon={<MapPin />} label="Start" isActive={activeTab === 'home'} onClick={() => setActiveTab('home')} />
-        <NavItem icon={<Map />} label="Atrakcje" isActive={activeTab === 'trails'} onClick={() => setActiveTab('trails')} />
+        <NavItem icon={<MapIcon />} label="Mapa" isActive={activeTab === 'trails'} onClick={() => setActiveTab('trails')} />
         <NavItem icon={<CalendarDays />} label="Planer" isActive={activeTab === 'planner'} onClick={() => setActiveTab('planner')} />
         <NavItem icon={<MessageCircle />} label="Asystent" isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} />
         <NavItem icon={<History />} label="Pamiętnik" isActive={activeTab === 'journal'} onClick={() => { setActiveTab('journal'); setActiveTrip(null); }} />
@@ -212,15 +354,12 @@ function HomeView({ setActiveTab, navigateToTrailsWithFilter }) {
         </div>
       </div>
 
-      {/* Szybkie Akcje */}
       <div>
         <h3 className="font-bold text-slate-800 mb-4 text-xl flex items-center gap-2">Szybkie menu</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <QuickActionButton icon={<CalendarDays />} label="Kreator Trasy" color="bg-emerald-100 text-emerald-700" iconColor="bg-emerald-500" onClick={() => setActiveTab('planner')} />
+          <QuickActionButton icon={<CalendarDays />} label="Kreator Planu" color="bg-emerald-100 text-emerald-700" iconColor="bg-emerald-500" onClick={() => setActiveTab('planner')} />
           <QuickActionButton icon={<MessageCircle />} label="Asystent Chat" color="bg-purple-100 text-purple-700" iconColor="bg-purple-500" onClick={() => setActiveTab('chat')} />
-          <QuickActionButton icon={<Map />} label="Mapa Atrakcji" color="bg-orange-100 text-orange-700" iconColor="bg-orange-500" onClick={() => navigateToTrailsWithFilter('Wszystkie')} />
-          
-          {/* NOWOŚĆ: Przycisk uruchamiający filtr Gastronomia */}
+          <QuickActionButton icon={<MapIcon />} label="Mapa Atrakcji" color="bg-blue-100 text-blue-700" iconColor="bg-blue-500" onClick={() => navigateToTrailsWithFilter('Wszystkie')} />
           <QuickActionButton icon={<Utensils />} label="Restauracje" color="bg-amber-100 text-amber-800" iconColor="bg-amber-500" onClick={() => navigateToTrailsWithFilter('🍲 Gastronomia')} />
         </div>
       </div>
@@ -242,7 +381,7 @@ function HomeView({ setActiveTab, navigateToTrailsWithFilter }) {
               <span className="bg-red-100 text-red-700 px-2 py-1 rounded-lg">Architektura</span>
             </div>
             <button onClick={() => navigateToTrailsWithFilter('Leżajsk')} className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition">
-              Zobacz szczegóły
+              Zobacz na Mapie
             </button>
           </div>
         </div>
@@ -253,55 +392,23 @@ function HomeView({ setActiveTab, navigateToTrailsWithFilter }) {
 }
 
 // ==========================================
-// WIDOK: SZLAKI I MAPA (Z Opcją Zoom i Drag)
+// WIDOK: SZLAKI I MAPA OPENSTREETMAP
 // ==========================================
 function TrailsView({ onAddTrip, activeFilter, setActiveFilter }) {
   const [selectedPin, setSelectedPin] = useState(null);
   const [isMapVisibleOnMobile, setIsMapVisibleOnMobile] = useState(false); 
-  
-  // Zmienne mapy interaktywnej
-  const [scale, setScale] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   const filters = ['Wszystkie', 'Leżajsk', 'Łańcut', 'Brzóza Królewska', 'Sieniawa', '🍲 Gastronomia'];
   
-  // NOWOŚĆ: Inteligentne filtrowanie (w tym dla "Gastronomii")
   const filteredTrails = TRAILS_DATA.filter(t => {
       if (activeFilter === 'Wszystkie') return true;
-      if (activeFilter === '🍲 Gastronomia') return t.food && t.food !== "Prowiant własny" && t.food !== "Prowiant z plecaka";
+      if (activeFilter === '🍲 Gastronomia') return t.food && t.food !== "Prowiant własny" && !t.food.includes("Brak");
       return t.location === activeFilter;
   });
 
-  // Obsługa przeciągania mapy
-  const handleMouseDown = (e) => {
-      setIsDragging(true);
-      setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
-  };
-  const handleMouseMove = (e) => {
-      if (isDragging) setPosition({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
-  };
-  const handleMouseUp = () => setIsDragging(false);
-
-  // Obsługa dla dotyku (Smartfony)
-  const handleTouchStart = (e) => {
-      setIsDragging(true);
-      setDragStart({ x: e.touches[0].clientX - position.x, y: e.touches[0].clientY - position.y });
-  };
-  const handleTouchMove = (e) => {
-      if (isDragging) setPosition({ x: e.touches[0].clientX - dragStart.x, y: e.touches[0].clientY - dragStart.y });
-  };
-
-  // Zoom mapy
-  const handleZoomIn = () => setScale(s => Math.min(s + 0.5, 3));
-  const handleZoomOut = () => setScale(s => Math.max(s - 0.5, 0.5));
-  const handleReset = () => { setScale(1); setPosition({x:0, y:0}); };
-
   return (
-    <div className="h-full flex flex-col md:p-6 p-0 max-w-7xl mx-auto relative">
+    <div className="h-full flex flex-col md:p-6 p-0 max-w-7xl mx-auto relative z-10">
       
-      {/* Nagłówek i Filtry */}
       <div className="bg-white md:bg-transparent p-4 md:p-0 border-b md:border-none border-slate-200 shrink-0 z-20">
         <div className="flex justify-between items-center mb-4">
           <h2 className="font-bold text-2xl text-slate-800">
@@ -324,14 +431,14 @@ function TrailsView({ onAddTrip, activeFilter, setActiveFilter }) {
 
       <div className="flex-1 flex flex-col md:flex-row gap-6 overflow-hidden md:mt-2 relative">
         
-        {/* LEWA: Lista Szlaków */}
-        <div className={`w-full md:w-1/2 lg:w-5/12 overflow-y-auto p-4 md:p-0 space-y-4 pb-32 md:pb-4 custom-scrollbar ${isMapVisibleOnMobile ? 'hidden md:block' : 'block'}`}>
+        {/* LEWA KOLUMNA: Lista */}
+        <div className={`w-full md:w-1/2 lg:w-4/12 overflow-y-auto p-4 md:p-0 space-y-4 pb-32 md:pb-4 custom-scrollbar ${isMapVisibleOnMobile ? 'hidden md:block' : 'block'}`}>
           {filteredTrails.length === 0 && (
              <div className="text-center p-10 text-slate-400 font-medium">Brak wyników w tej kategorii.</div>
           )}
           {filteredTrails.map(trail => (
             <div key={trail.id} 
-              onMouseEnter={() => setSelectedPin(trail)}
+              onClick={() => setSelectedPin(trail)}
               className={`bg-white rounded-3xl p-5 shadow-sm border-2 transition-all cursor-pointer ${selectedPin?.id === trail.id ? 'border-emerald-500 shadow-md scale-[1.02]' : 'border-slate-100 hover:border-slate-300'}`}
             >
               <div className="flex items-start gap-4 mb-4">
@@ -357,9 +464,8 @@ function TrailsView({ onAddTrip, activeFilter, setActiveFilter }) {
                   <Train size={18} className="text-blue-500 shrink-0 mt-0.5" />
                   <p className="text-xs text-slate-600 leading-relaxed"><b>Dojazd:</b> {trail.transport}</p>
                 </div>
-                {/* Wyróżniony blok jedzenia */}
-                <div className={`flex items-start gap-3 rounded-xl p-3 ${activeFilter === '🍲 Gastronomia' ? 'bg-amber-100 border border-amber-200' : 'bg-amber-50/50'}`}>
-                  <Utensils size={18} className="text-amber-600 shrink-0 mt-0.5" />
+                <div className={`flex items-start gap-3 rounded-xl p-3 ${activeFilter === '🍲 Gastronomia' ? 'bg-amber-100 border border-amber-200' : 'bg-slate-50 border border-slate-100'}`}>
+                  <Utensils size={18} className={`${activeFilter === '🍲 Gastronomia' ? 'text-amber-600' : 'text-slate-400'} shrink-0 mt-0.5`} />
                   <p className="text-xs text-slate-800 leading-relaxed"><b>Jedzenie:</b> {trail.food}</p>
                 </div>
               </div>
@@ -372,72 +478,24 @@ function TrailsView({ onAddTrip, activeFilter, setActiveFilter }) {
           ))}
         </div>
 
-        {/* PRAWA: Duża Interaktywna Mapa */}
-        <div className={`w-full md:w-1/2 lg:w-7/12 relative bg-emerald-50 rounded-none md:rounded-3xl border border-emerald-200 overflow-hidden shadow-inner flex flex-col min-h-[500px] h-full ${!isMapVisibleOnMobile ? 'hidden md:flex' : 'flex'}`}>
-          
-          <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-2 rounded-lg text-xs font-bold text-emerald-800 shadow-sm border border-emerald-100 z-20 flex flex-col gap-1">
-             <span>Mapa Ziemi Leżajskiej</span>
-             <span className="text-[10px] text-slate-500 font-normal">Przeciągnij by przesunąć mapę</span>
-          </div>
-
-          {/* Kontrolki Zoom */}
-          <div className="absolute right-4 top-4 flex flex-col gap-2 z-20">
-             <button onClick={handleZoomIn} className="w-10 h-10 bg-white rounded-xl shadow-md border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 hover:text-emerald-600 transition"><Plus size={20}/></button>
-             <button onClick={handleZoomOut} className="w-10 h-10 bg-white rounded-xl shadow-md border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 hover:text-emerald-600 transition"><Minus size={20}/></button>
-             <button onClick={handleReset} className="w-10 h-10 bg-emerald-600 rounded-xl shadow-md border border-emerald-700 flex items-center justify-center text-white hover:bg-emerald-500 transition mt-2" title="Wyśrodkuj"><Maximize size={18}/></button>
-          </div>
-
-          {/* Kontener Mapy (Drag & Scale) */}
-          <div 
-             className={`w-full h-full relative ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-             onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}
-             onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleMouseUp}
-          >
-             <div 
-                className="absolute inset-0 w-full h-full"
-                style={{ 
-                  transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`, 
-                  transformOrigin: 'center center',
-                  transition: isDragging ? 'none' : 'transform 0.1s ease-out'
-                }}
-             >
-                <div className="absolute inset-0 opacity-20 pointer-events-none">
-                  <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="topo" x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse"><path d="M10,10 Q40,40 90,10 M20,30 Q50,60 90,30 M10,50 Q40,80 80,50 M30,70 Q60,90 90,70" fill="none" stroke="#059669" strokeWidth="1" opacity="0.5"/><path d="M0,20 Q30,50 80,20 M10,40 Q40,70 80,40" fill="none" stroke="#047857" strokeWidth="0.5" opacity="0.3"/></pattern></defs><rect x="0" y="0" width="100%" height="100%" fill="url(#topo)" /></svg>
-                </div>
-
-                {filteredTrails.map(trail => (
-                  <div 
-                    key={`pin-${trail.id}`}
-                    onClick={(e) => { e.stopPropagation(); setSelectedPin(trail); }}
-                    className="absolute transform -translate-x-1/2 -translate-y-1/2 hover:scale-125 transition-transform z-10 cursor-pointer"
-                    style={{ left: trail.mapX, top: trail.mapY }}
-                  >
-                    <div className="relative flex flex-col items-center">
-                      <div className={`p-1.5 rounded-full shadow-md ${selectedPin?.id === trail.id ? 'ring-4 ring-emerald-400 scale-125 bg-white' : 'bg-white/80 backdrop-blur'} transition-all`}>
-                        {/* Ikona sztućców jeśli to filter Gastro */}
-                        {activeFilter === '🍲 Gastronomia' ? 
-                           <Utensils size={24} className={`${trail.color.replace('bg-', 'text-')} fill-current`} /> :
-                           <MapPin size={24} className={`${trail.color.replace('bg-', 'text-')} fill-current`} />
-                        }
-                      </div>
-                      <span className={`absolute top-full mt-2 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-lg whitespace-nowrap pointer-events-none transition-all ${selectedPin?.id === trail.id || scale > 1.5 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'}`}>
-                        {trail.name}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-             </div>
-          </div>
+        {/* PRAWA KOLUMNA: Mapka */}
+        <div className={`w-full md:w-1/2 lg:w-8/12 relative bg-emerald-50 rounded-none md:rounded-3xl border border-emerald-200 overflow-hidden shadow-inner flex flex-col min-h-[500px] h-full ${!isMapVisibleOnMobile ? 'hidden md:flex' : 'flex'}`}>
+          <DynamicLeafletMap 
+             trails={filteredTrails} 
+             activeFilter={activeFilter} 
+             selectedPin={selectedPin} 
+             setSelectedPin={setSelectedPin} 
+             onAddTrip={onAddTrip} 
+          />
         </div>
       </div>
 
-      {/* Pływający Przycisk Mapa/Lista na Smartfony */}
       <div className="md:hidden fixed bottom-20 left-1/2 -translate-x-1/2 z-40">
           <button 
               onClick={() => setIsMapVisibleOnMobile(!isMapVisibleOnMobile)} 
               className="bg-slate-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-2 font-bold hover:scale-105 transition-transform"
           >
-              {isMapVisibleOnMobile ? <><List size={18}/> Pokaż Listę</> : <><Map size={18}/> Pokaż Mapę</>}
+              {isMapVisibleOnMobile ? <><List size={18}/> Pokaż Listę</> : <><MapIcon size={18}/> Pokaż Mapę</>}
           </button>
       </div>
 
@@ -446,7 +504,7 @@ function TrailsView({ onAddTrip, activeFilter, setActiveFilter }) {
 }
 
 // ==========================================
-// WIDOK: OSOBISTY ASYSTENT CHAT (Mądrzejszy!)
+// WIDOK: OSOBISTY ASYSTENT CHAT 
 // ==========================================
 function ChatAssistantView() {
   const [msg, setMsg] = useState("");
@@ -469,12 +527,11 @@ function ChatAssistantView() {
       const isVercel = window.location.hostname.includes('vercel.app');
       let reply = "";
       
-      // NOWOŚĆ: Budujemy kontekst dla AI z naszej aplikacji, żeby znał miejsca i swoje ograniczenia!
       const contextData = TRAILS_DATA.map(t => `${t.name} (Lokalizacja: ${t.location}, Jedzenie/Restauracje: ${t.food})`).join('; ');
-      const systemInstruction = `Jesteś bardzo pomocnym przewodnikiem turystycznym po Leżajsku i okolicach (Podkarpacie).
+      const systemInstruction = `Jesteś bardzo pomocnym przewodnikiem turystycznym po Leżajsku i okolicach (Podkarpacie, Łańcut, Sieniawa, Brzóza Królewska).
 Oto baza wiedzy z Twojej aplikacji: ${contextData}.
 WAŻNE OGRANICZENIE: Jesteś tylko czatem tekstowym. NIE MASZ dostępu do klikania na ekranie ani pokazywania miejsc na interaktywnej mapie. 
-Jeśli użytkownik prosi "pokaż na mapie" lub "gdzie to jest", odpowiedz opisowo (np. "Niestety nie mogę kliknąć na mapie, ale to miejsce znajdziesz w sekcji Trasy i Atrakcje w aplikacji. Obiekt znajduje się niedaleko...").
+Jeśli użytkownik prosi "pokaż na mapie", odpowiedz opisowo (np. "Wejdź w zakładkę Mapa i Atrakcje, znajdziesz to miejsce obok...").
 Zawsze odpowiadaj krótko i przyjaźnie. Pytanie turysty: ${msg}`;
 
       if (isVercel) {
@@ -506,7 +563,7 @@ Zawsze odpowiadaj krótko i przyjaźnie. Pytanie turysty: ${msg}`;
       setChat([...newChat, { role: 'ai', text: reply }]);
     } catch (e) {
       console.error(e);
-      setChat([...newChat, { role: 'ai', text: "⚠️ Błąd połączenia z serwerem. Jeśli jesteś na Vercelu, upewnij się, że dodałeś klucz 'OPENAI_API_KEY'!" }]);
+      setChat([...newChat, { role: 'ai', text: "⚠️ Błąd połączenia z serwerem. Upewnij się, że dodałeś klucz 'OPENAI_API_KEY'!" }]);
     } finally {
       setIsLoading(false);
     }
@@ -584,7 +641,7 @@ function AIPlannerView({ onSavePlan }) {
 
       setGeneratedPlan({
         title: `Twój idealny wyjazd (${preferences.days} dni)`,
-        description: preferences.companions === 'kids' ? "Wybrałem trasy spacerowe i pełne atrakcji dla najmłodszych." : "Oto optymalny plan obejmujący najważniejsze zabytki i walory naturalne Leżajska i okolic.",
+        description: preferences.companions === 'kids' ? "Wybrałem trasy spacerowe i pełne atrakcji dla najmłodszych." : "Oto optymalny plan obejmujący najciekawsze zabytki i walory naturalne Leżajska i okolic.",
         days: selectedTrails
       });
       setIsGenerating(false);
@@ -597,7 +654,7 @@ function AIPlannerView({ onSavePlan }) {
       <div className="bg-emerald-900 rounded-3xl p-6 md:p-10 text-white shadow-xl relative overflow-hidden shrink-0 mb-6">
         <div className="absolute -right-10 -bottom-10 opacity-20"><CalendarDays size={150} /></div>
         <h2 className="text-2xl md:text-4xl font-black mb-2 relative z-10">Kreator Planu Wyjazdu</h2>
-        <p className="text-emerald-200 max-w-lg relative z-10">Zamiast przeglądać dziesiątki stron, powiedz mi czego potrzebujesz. Zbuduję harmonogram zwiedzania okolic Leżajska specjalnie dla Ciebie.</p>
+        <p className="text-emerald-200 max-w-lg relative z-10">Zamiast przeglądać dziesiątki stron, powiedz mi czego potrzebujesz. Zbuduję harmonogram wycieczek w Leżajsku specjalnie dla Ciebie.</p>
       </div>
 
       <div className="flex-1 bg-white rounded-3xl shadow-sm border border-slate-200 p-6 md:p-10 overflow-y-auto custom-scrollbar">
@@ -617,7 +674,7 @@ function AIPlannerView({ onSavePlan }) {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <button onClick={() => setPreferences({...preferences, companions: 'adults'})} className={`p-4 rounded-xl font-bold border-2 flex flex-col items-center gap-2 transition-all ${preferences.companions === 'adults' ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-100 bg-white text-slate-500'}`}><User size={24}/> Dorośli</button>
                 <button onClick={() => setPreferences({...preferences, companions: 'kids'})} className={`p-4 rounded-xl font-bold border-2 flex flex-col items-center gap-2 transition-all ${preferences.companions === 'kids' ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-100 bg-white text-slate-500'}`}><Heart size={24}/> Z dziećmi</button>
-                <button onClick={() => setPreferences({...preferences, companions: 'dog'})} className={`p-4 rounded-xl font-bold border-2 flex flex-col items-center gap-2 transition-all ${preferences.companions === 'dog' ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-100 bg-white text-slate-500'}`}><Map size={24}/> Z psem</button>
+                <button onClick={() => setPreferences({...preferences, companions: 'dog'})} className={`p-4 rounded-xl font-bold border-2 flex flex-col items-center gap-2 transition-all ${preferences.companions === 'dog' ? 'border-emerald-500 bg-emerald-50 text-emerald-700' : 'border-slate-100 bg-white text-slate-500'}`}><MapIcon size={24}/> Z psem</button>
               </div>
             </div>
 
